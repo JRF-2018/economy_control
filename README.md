@@ -1,6 +1,6 @@
 # economy_control
 
-<!-- Time-stamp: "2022-05-15T12:49:05Z" -->
+<!-- Time-stamp: "2022-05-15T13:40:57Z" -->
 
 村田安雄『動的経済システムの最適制御』の検算＆シミュレーション。
 
@@ -14,6 +14,10 @@
 
 《JRF-2018/sympy_matrix_tools: Some tools for sympy matrices.》  
 https://github.com/JRF-2018/sympy_matrix_tools
+
+本当はこういった検算・証明は専門の theorem prover を使ってやるべきであ
+る。しかし、無料で誰でも使える Google Colab & Python で示せればそれは
+それで価値があるのではないかと考えた。
 
 なお、*.ipynb と同じ名前を持った *.py は *.ipynb から jupytext を使っ
 て生成した。それらは diff がしやすいように作った管理用の Python ファイ
@@ -39,6 +43,11 @@ https://github.com/JRF-2018/sympy_matrix_tools
 かシュタッケルベルク解とか、離散型最大原理・離散型ハミルトニアンなど様々
 な概念が出てきて、それをググったりすることでいろいろ知ることができた。 - JRF のひとこと》  
 http://jrf.cocolog-nifty.com/statuses/2022/04/post-675aa7.html
+
+また、↓にここに書ききれない裏話などを載せている。
+
+《村田安雄『動的経済システムの最適制御』の検算＆シミュレーションを少し行った。今のところ第2章、第4章、第3章2節b の検算のみで、Google Colab で Python のノートブックを作成して行った。 - JRF のひとこと》  
+http://jrf.cocolog-nifty.com/statuses/2022/05/post-3b108d.html
 
 
 ## TODO
