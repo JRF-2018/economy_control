@@ -14,7 +14,7 @@
 # + [markdown] id="-s-r8b183fe8"
 # # 村田安雄『動的経済システムの最適制御』第3章2節bの検算
 #
-# (Version: 0.0.1)
+# (Version: 0.0.2)
 #
 # 「第3章 離散時間ダイナミック・プログラミングの方法と消費計画への応用」の「2. 確実性下の D.P. の最適化原理」の「［b］m 制御変数と n 状態変数の D.P.」について、行列に関する計算の「検算」を行ってみる。
 #
@@ -22,12 +22,20 @@
 #
 # 本当はこういった証明は専門の theorem prover を使ってやるべきである。しかし、無料で誰でも使える Google Colab & Python で示せればそれはそれで価値があるのではないかと考えた。
 
-# + colab={"base_uri": "https://localhost:8080/"} id="jiU2987p_niD" outputId="6c107652-fe20-495d-a32f-667e733fe8d1"
+# + colab={"base_uri": "https://localhost:8080/"} id="jiU2987p_niD" outputId="071a1de4-ffd8-4a01-b9a5-8b5de22b049c"
 from time import gmtime, strftime
 print("Time-stamp: <%s>" % strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()))
 
-# + colab={"base_uri": "https://localhost:8080/"} id="XEwKNWzrgtk4" outputId="c7b1c38b-7b7b-4032-8973-9432772f192e"
+# + colab={"base_uri": "https://localhost:8080/"} id="XEwKNWzrgtk4" outputId="5c5cd8e7-a9ed-4e62-aacf-c8956af2f9dc"
 # !pip install git+https://github.com/JRF-2018/sympy_matrix_tools
+
+# + colab={"base_uri": "https://localhost:8080/", "height": 35} id="bjEwAq1cbaJw" outputId="79286c00-9966-472e-dba7-05d39365d484"
+import sympy
+sympy.__version__
+
+# + colab={"base_uri": "https://localhost:8080/", "height": 35} id="LEmmj-7abNAY" outputId="791a58ac-04b6-419b-de9b-cebaa98a5b1f"
+import sympy_matrix_tools
+sympy_matrix_tools.__version__
 
 # + id="BQjUJcHwgxuH"
 from sympy import *
@@ -58,7 +66,7 @@ k = Symbol("k", integer=True, positive=True)
 P_T = MatrixSymbol("P_T", n, 1)
 Q_T = MatrixSymbol("Q_T", n, n)
 
-EQQT = Eq(Q_T.T, Q_T)
+EQQTT = Eq(Q_T.T, Q_T)
 
 J = MatrixFunction("J", 1, 1)
 w = MatrixFunction("w", 1, 1)
@@ -127,7 +135,7 @@ EQ20D = Eq(v(t, y(t - 1)),
 # + id="3x4SV3h-yNjX"
 EQ18a_rhs = P_T.T * y(T) + Rational(1, 2) * y(T).T * Q_T * y(T)
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="Q52c1UWFy65-" outputId="9c324cef-55bf-4ef3-a45b-0fc84bc29821"
+# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="Q52c1UWFy65-" outputId="7e63d075-9726-4826-d27b-4ab06df9acda"
 EQ11tmp = EQ11.subs(t, T)
 EQ18tmp = EQ18a_rhs.subs(EQ11tmp.lhs, EQ11tmp.rhs)
 EQ18tmp
@@ -135,50 +143,50 @@ EQ18tmp
 # + [markdown] id="Vjtq-IHfzcQ2"
 # MatrixFunction はまだ微分に対応していないのでいったんここに出てくるものを MatrixSymbol に置き換えねばならない。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="ih51kChczLY-" outputId="fc656757-ec94-4f21-be2e-8c2d0d962b24"
+# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="ih51kChczLY-" outputId="dd9f48e5-bba8-432f-dfdd-3ef46d769ccb"
 z_T = MatrixSymbol("z_T", n, 1)
 y_Tm1 = MatrixSymbol("y_Tm1", n, 1)
 x_T = MatrixSymbol("x_T", m, 1)
 EQ18tmp2 = EQ18tmp.subs({x(T): x_T, y(T - 1): y_Tm1, z(T): z_T})
 EQ18tmp2
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="QgTR0jp60sCW" outputId="fcb8e24b-7ec6-4c2d-b259-507e9d192b50"
+# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="QgTR0jp60sCW" outputId="90d6d582-f03a-4202-fd3d-27b6aecd5368"
 EQ18tmp3 = EQ18tmp2.diff(x_T)\
-                   .subs(EQQT.lhs, EQQT.rhs)\
+                   .subs(EQQTT.lhs, EQQTT.rhs)\
                    .subs({x_T: x(T), y_Tm1: y(T - 1), z_T: z(T)})\
                    .doit()
 EQ18tmp3
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="VZdvkpdS0wWX" outputId="8fecdd67-4527-41cb-fc83-832f3692ec5e"
+# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="VZdvkpdS0wWX" outputId="936ceb02-1eb5-4444-a503-64260016dea9"
 EQ18tmp4 = EQ18tmp3.expand().doit()
 EQ18tmp4
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="McOUs36F1hbO" outputId="e5aab21e-7454-43c1-ced2-533fc1f7a88f"
+# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="McOUs36F1hbO" outputId="56c74360-89be-4806-dc9d-c79856b9ea66"
 EQ18tmp5 = mat_collect(mat_divide(EQ18tmp4, B.T * Q_T * B), ((B.T * Q_T * B) ** -1) * B.T, right=True)
 EQ18tmp5
 
 # + [markdown] id="-zlWWNHC-CMn"
 # EQ18tmp5 == 0 と置いて、これが EQ19D と同じことを示したい。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="ZAv51P462j9-" outputId="0b12c591-5dea-4f5f-dec1-cc17b96da3d6"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="ZAv51P462j9-" outputId="b099f16b-57d9-40d6-8f24-a7a8272ae285"
 EQ19a = EQ19D.subs(t, T).subs(Q(T), Q_T).subs(P(T), P_T)
 (EQ19a.lhs - EQ19a.rhs - EQ18tmp5).expand().doit()
 
 # + [markdown] id="jiCxOcHB9vNt"
 # E19a と EQ18tmp5 は同じことであることが示せた。最適値を求めるためにこれを EQ18tmp に代入して整理していく。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 108} id="uxVZgILd9Rxm" outputId="b337375a-049b-4c6e-d4b2-1919a726a47f"
+# + colab={"base_uri": "https://localhost:8080/", "height": 108} id="uxVZgILd9Rxm" outputId="fdd56646-e646-435d-9742-ad2a880e56a7"
 EQ20tmp = EQ18tmp.subs(EQ19a.lhs, EQ19a.rhs)
 EQ20tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 180} id="1BmZmVCu-Arm" outputId="1a18a6b4-a834-46ac-a09b-4766aad8198a"
-EQ20tmp2 = mat_trivial_divide(EQ20tmp.expand().subs(EQQT.lhs, EQQT.rhs)).doit()
+# + colab={"base_uri": "https://localhost:8080/", "height": 180} id="1BmZmVCu-Arm" outputId="73e07e3b-cf6f-40a9-a8d0-d8e0fbe97044"
+EQ20tmp2 = mat_trivial_divide(EQ20tmp.expand().subs(EQQTT.lhs, EQQTT.rhs)).doit()
 EQ20tmp2
 
 # + [markdown] id="7p6nKCLz93GX"
 # これが EQ20D と等しいことを示したい。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 180} id="IB0fIS22VVCS" outputId="19cfe2c2-4503-4ae7-c022-88946f238271"
+# + colab={"base_uri": "https://localhost:8080/", "height": 180} id="IB0fIS22VVCS" outputId="13d80802-0c7e-4cdd-b079-f806eeadd7f6"
 EQ21a = EQ21D.subs(t, T).subs(Q(T), Q_T)
 EQ22a = EQ22D.subs(t, T).subs(Q(T), Q_T).subs(P(T), P_T)
 EQ20a = EQ20D.subs(t, T).subs(Q(T), Q_T).subs(P(T), P_T)\
@@ -188,7 +196,7 @@ EQ20tmp3 = EQ20a.rhs.subs({EQ21a.lhs: EQ21a.rhs, EQ22a.lhs: EQ22a.rhs})\
                     .expand().doit()
 EQ20tmp3
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="obekGmrjDSc3" outputId="5070c6db-cf72-4186-a820-2aee7ecd9d59"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="obekGmrjDSc3" outputId="4914e755-d605-45b5-9bb4-78fa63ff9f72"
 (EQ20tmp2 - EQ20tmp3).expand().doit()
 
 # + [markdown] id="bKK740TvK1YM"
@@ -196,17 +204,17 @@ EQ20tmp3
 #
 # 次に式(18b)を示していこう。
 
-# + id="_Ak_u9UkENpN" colab={"base_uri": "https://localhost:8080/", "height": 98} outputId="d6857f87-0ed2-4806-8c49-5b894e77b6d8"
+# + id="_Ak_u9UkENpN" colab={"base_uri": "https://localhost:8080/", "height": 98} outputId="fd2f7cd6-2cc3-438f-92b7-35b28c1b761c"
 EQ17_lhs_tmp = EQ17_lhs.subs(tau, T - 1)
 EQ17_rhs_tmp = EQ17_rhs.subs(tau, T - 1)
 EQ13tmp = EQ13.subs(t, T -1)
 EQ18tmp = EQ17_rhs_tmp.subs({EQ13tmp.lhs: EQ13tmp.rhs, EQ20a.lhs: EQ20a.rhs})
 EQ18tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="jv39y4EOxe1Y" outputId="a666e322-5091-4bab-bbe3-727c0f4e3405"
+# + colab={"base_uri": "https://localhost:8080/", "height": 72} id="jv39y4EOxe1Y" outputId="5c4851c1-ace3-469f-d6e6-eaf198f6176f"
 EQ13tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="m15B1exuYz-L" outputId="f766f0fb-4c9d-4f54-9682-ac5f26a45c7c"
+# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="m15B1exuYz-L" outputId="35599c59-e48b-4418-ec3f-82d5ef8a5fbc"
 EQ18b_rhs = P(T - 1).T * y(T - 1) \
     + Rational(1, 2) * y(T - 1).T * Q(T - 1) * y(T-1) + g(T - 1)
 EQ24tmp = EQ24D.subs(t, T - 1)
@@ -217,36 +225,36 @@ EQ18tmp2 = EQ18b_rhs.subs({EQ24tmp.lhs: EQ24tmp.rhs,
                            EQ25tmp.lhs: EQ25tmp.rhs,
                            Q(T): Q_T,
                            P(T): P_T,
-                           EQQT.lhs: EQQT.rhs})
+                           EQQTT.lhs: EQQTT.rhs})
 EQ18tmp2
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="v7aAjf1fah0x" outputId="405465d2-19c5-4114-92c3-3e75c7a94aad"
+# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="v7aAjf1fah0x" outputId="b99c679d-14e5-4042-b971-42b61a5f6c22"
 EQ21tmp = EQ21D.subs(t, T).subs(Q(T), Q_T)
 EQ18tmp3 = (EQ18tmp - EQ18tmp2).subs(EQ21tmp.lhs, EQ21tmp.rhs).expand()\
-    .subs(EQQT.lhs, EQQT.rhs).doit()
+    .subs(EQQTT.lhs, EQQTT.rhs).doit()
 EQ18tmp3
 
 # + [markdown] id="7Dv--QP1mIJp"
 # 今次の式が成り立つことから、B の逆行列は取れないが、X == Q_T と仮定する。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="nZg9rufLaonL" outputId="c1441260-7506-443c-9707-56bd5107feed"
+# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="nZg9rufLaonL" outputId="1a9a265f-fa98-4691-eed9-f1cc55d6943a"
 X = MatrixSymbol("X", n, n)
 EQtmp = Eq(X, (Q_T * B * (B.T * Q_T * B) ** -1 * B.T * Q_T))
 EQtmp2 = Eq(EQtmp.lhs * B, mat_trivial_divide(EQtmp.rhs * B))
 EQtmp2
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="woix3CP0mV1w" outputId="068c49bd-bb63-4199-d80d-bdc29a517950"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="woix3CP0mV1w" outputId="4275039d-e28d-47a4-d67c-743b4d8b3dd5"
 EQ18tmp3.subs(EQtmp.rhs, Q_T).doit()
 
 # + [markdown] id="-PGUpDkKmmYC"
 # ちょっと裏技っぽいのを使ったが、式(18b)は示せたものとする。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 80} id="JRzTUN_wj51x" outputId="2a4d0f82-fdfa-4a9a-aa10-745c90532d2a"
+# + colab={"base_uri": "https://localhost:8080/", "height": 80} id="JRzTUN_wj51x" outputId="3506aa20-5c08-4620-8ca8-0ee7a67cd15e"
 EQ11tmp = EQ11.subs(t, T - 1)
 EQ18tmp = EQ18b_rhs.subs(EQ11tmp.lhs, EQ11tmp.rhs)
 EQ18tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="JVcqx5h08Xeu" outputId="efac4907-8adc-40b5-8b1f-59225f863712"
+# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="JVcqx5h08Xeu" outputId="3bd98e8e-bca2-4535-f5b0-8cf75cb8a40e"
 z_Tm1 = MatrixSymbol("z_Tm1", n, 1)
 y_Tm2 = MatrixSymbol("y_Tm2", n, 1)
 x_Tm1 = MatrixSymbol("x_Tm1", m, 1)
@@ -275,11 +283,11 @@ EQ18tmp4
 EQ21tmp = EQ21D.subs(t, t + 1)
 EQ24tmp = EQ24D.subs(EQ21tmp.lhs, EQ21tmp.rhs).expand().doit()
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="8jeNN4t4qJJB" outputId="97cab424-5f72-4cbf-81d1-10d9379abf73"
+# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="8jeNN4t4qJJB" outputId="dd47155e-ac7d-45be-dd59-ed764d3c940a"
 EQ24tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="GpJOatscqLDC" outputId="69b80b2c-915b-4fa7-fb2c-db8b2b4c68a7"
-EQ24tmp2 = EQ24tmp.rhs.T.subs(Q(t + 1).T, Q(t + 1)).subs(EQQT.lhs, EQQT.rhs).doit()
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="GpJOatscqLDC" outputId="ff7a8bd7-8062-41fa-e779-1148e4dca8cf"
+EQ24tmp2 = EQ24tmp.rhs.T.subs(Q(t + 1).T, Q(t + 1)).subs(EQQTT.lhs, EQQTT.rhs).doit()
 (EQ24tmp.rhs - EQ24tmp2).expand().doit()
 
 # + [markdown] id="7jlKw1E6rjcg"
@@ -291,30 +299,30 @@ EQQtT = Eq(Q(t).T, Q(t))
 # + [markdown] id="_Qoahu_vrps3"
 # 微分に戻ろう。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="E-PyiEoAsP0Y" outputId="b7906827-0016-4902-d35a-978692e55ba8"
+# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="E-PyiEoAsP0Y" outputId="7a6b8707-92cb-4216-982c-00cb1b82a829"
 EQQtTtmp = EQQtT.subs(t, T - 1)
 EQ18tmp5 = EQ18tmp4.subs(EQQtTtmp.lhs, EQQtTtmp.rhs).expand().doit()
 EQ18tmp5
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="dCw5vn_lsfSR" outputId="d5c3a1e6-a0d8-4205-8c98-6068b9d59b85"
+# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="dCw5vn_lsfSR" outputId="8fec66e3-7f6f-441b-c0f9-571862b8ee57"
 EQ18tmp6 = mat_collect(mat_divide(EQ18tmp5, B.T * Q(T - 1) * B), ((B.T * Q(T - 1) * B) ** -1) * B.T, right=True)
 EQ18tmp6
 
 # + [markdown] id="vOq4YPfa-Q6-"
 # EQ18tmp6 == 0 と置いて、これが EQ19D と同じことを示したい。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="gJL7scS_tA44" outputId="ff1674e4-f302-494c-c575-6f434ebfabbb"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="gJL7scS_tA44" outputId="72de4b6e-251b-4170-b596-ce0fdfdefba2"
 EQ19b = EQ19D.subs(t, T - 1)
 (EQ19b.lhs - EQ19b.rhs - EQ18tmp6).expand().doit()
 
 # + [markdown] id="KxO66sfmyloX"
 # E19b と EQ18tmp6 は同じことであることが示せた。これを最適値を求めるため EQ18tmp に代入して整理していく。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 129} id="mVeZOTNntRP4" outputId="6f8220a4-58c0-4a70-b6e2-0d577c47f23f"
+# + colab={"base_uri": "https://localhost:8080/", "height": 129} id="mVeZOTNntRP4" outputId="48a2e18c-d7b3-4825-dd96-7240e01453e4"
 EQ20tmp = EQ18tmp.subs(EQ19b.lhs, EQ19b.rhs)
 EQ20tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="DcPYXagpzQmv" outputId="72cf35f2-1ed6-4c0c-a352-e13ed0a5d292"
+# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="DcPYXagpzQmv" outputId="af6ccba2-e365-4473-a787-0ba225b4e6d9"
 EQQtTtmp = EQQtT.subs(t, T - 1)
 EQ20tmp2 = mat_trivial_divide(EQ20tmp.expand().subs(EQQtTtmp.lhs, EQQtTtmp.rhs)).doit()
 EQ20tmp2
@@ -322,7 +330,7 @@ EQ20tmp2
 # + [markdown] id="Z0RobKK69tnn"
 # これが EQ20D と同じであることを示したい。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="US7eVPyLzkaw" outputId="6da8ba27-9248-4892-aa11-ae2612309692"
+# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="US7eVPyLzkaw" outputId="3008605c-94d9-48bf-e367-798787db3308"
 EQ21tmp = EQ21D.subs(t, T - 1)
 EQ22tmp = EQ22D.subs(t, T - 1)
 EQ20tmp = EQ20D.subs(t, T - 1)
@@ -332,7 +340,7 @@ EQ20tmp3 = EQ20tmp.rhs.subs({EQ21tmp.lhs: EQ21tmp.rhs,
                       .expand().doit()
 EQ20tmp3
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="UCfwnvsV0fZQ" outputId="d68cfd8b-f329-4fd1-d611-9f977f904cba"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="UCfwnvsV0fZQ" outputId="c453d69e-bf00-4907-8c1d-892874ca7c14"
 (EQ20tmp2 - EQ20tmp3).expand().doit()
 
 # + [markdown] id="lQ-T_X2n0uO3"
@@ -341,14 +349,14 @@ EQ20tmp3
 # 次に帰納法の本題である。t := t において EQ19D EQ20D が成り立っているとき、t := t - 1 において EQ19D EQ20D が成り立っていることを示す。
 #
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="xgxfu3Xd0ofA" outputId="109f7514-47fe-4f84-a928-b9045f81aaa7"
+# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="xgxfu3Xd0ofA" outputId="e5057d5f-e410-4fed-a178-f0e279dc9f53"
 EQ17_lhs_tmp = EQ17_lhs.subs(tau, t - 1)
 EQ17_rhs_tmp = EQ17_rhs.subs(tau, t - 1)
 EQ13tmp = EQ13.subs(t, t -1)
 EQ18tmp = EQ17_rhs_tmp.subs({EQ13tmp.lhs: EQ13tmp.rhs, EQ20D.lhs: EQ20D.rhs})
 EQ18tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="x_LH6F8x18Lo" outputId="64583129-646d-4dbb-cf85-dacf35c64ae4"
+# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="x_LH6F8x18Lo" outputId="6b76890e-d075-449e-92f7-43a752105a32"
 EQ18c_rhs = P(t - 1).T * y(t - 1) \
     + Rational(1, 2) * y(t - 1).T * Q(t - 1) * y(t-1) + g(t - 1)
 EQ24tmp = EQ24D.subs(t, t - 1)
@@ -359,7 +367,7 @@ EQ18tmp2 = EQ18c_rhs.subs({EQ24tmp.lhs: EQ24tmp.rhs,
                            EQ25tmp.lhs: EQ25tmp.rhs})
 EQ18tmp2
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="wMVZFKi_2SPo" outputId="608e9292-1160-40c6-a97c-c2a09088d2f3"
+# + colab={"base_uri": "https://localhost:8080/", "height": 98} id="wMVZFKi_2SPo" outputId="bf197a51-ba9e-45f4-b0d8-6f720c0c62cc"
 EQ18tmp3 = (EQ18tmp - EQ18tmp2)\
     .subs(EQ21D.lhs, EQ21D.rhs).expand()\
     .subs(EQQtT.lhs, EQQtT.rhs).expand().doit()
@@ -368,15 +376,15 @@ EQ18tmp3
 # + [markdown] id="dF1IHJG53tXK"
 # ここで上の X のハックと同じものが成立しているとする。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="3T0s6Z_H3Jqg" outputId="8abf7947-cfb5-4ec3-b82a-847a7a4008ca"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="3T0s6Z_H3Jqg" outputId="26439c5c-361f-4728-d957-593e2421c953"
 EQ18tmp3.subs((Q(t) * B * (B.T * Q(t) * B) ** -1 * B.T * Q(t)), Q(t)).doit()
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 80} id="nfCo2wQ74Bqh" outputId="bc78fc2a-0eab-497a-db79-c8f769272d53"
+# + colab={"base_uri": "https://localhost:8080/", "height": 80} id="nfCo2wQ74Bqh" outputId="eaf8c0c5-9eaf-45b7-babd-0ec0b5ffacd1"
 EQ11tmp = EQ11.subs(t, t - 1)
 EQ18tmp = EQ18c_rhs.subs(EQ11tmp.lhs, EQ11tmp.rhs)
 EQ18tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="CBiCbMWf8Ljf" outputId="d64b71e7-7f58-447b-f770-adecd61babeb"
+# + colab={"base_uri": "https://localhost:8080/", "height": 58} id="CBiCbMWf8Ljf" outputId="4e9dbb73-0ab6-46bb-8501-98ac92f35342"
 z_tm1 = MatrixSymbol("z_tm1", n, 1)
 y_tm2 = MatrixSymbol("y_tm2", n, 1)
 x_tm1 = MatrixSymbol("x_tm1", m, 1)
@@ -398,30 +406,30 @@ EQ18tmp4 = EQ18tmp3.subs({x_tm1: x(t - 1),
                           g_tm1: g(t - 1)})
 EQ18tmp4
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="BmKhRFBn4hv_" outputId="5259770b-9055-423f-b1a1-1fe63e7e9ae1"
+# + colab={"base_uri": "https://localhost:8080/", "height": 38} id="BmKhRFBn4hv_" outputId="d4bf71ac-0bc4-42c0-8780-a0733ce9f5ae"
 EQQtTtmp = EQQtT.subs(t, t - 1)
 EQ18tmp5 = EQ18tmp4.subs(EQQtTtmp.lhs, EQQtTtmp.rhs).expand().doit()
 EQ18tmp5
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="UeCIweRR5DW4" outputId="fdb62bf2-e24b-4080-c235-1bbd83569bcc"
+# + colab={"base_uri": "https://localhost:8080/", "height": 42} id="UeCIweRR5DW4" outputId="75b2673d-d01b-4125-fcf9-134250533ef3"
 EQ18tmp6 = mat_collect(mat_divide(EQ18tmp5, B.T * Q(t - 1) * B), ((B.T * Q(t - 1) * B) ** -1) * B.T, right=True)
 EQ18tmp6
 
 # + [markdown] id="BWWRwatk-hWH"
 # EQ18tmp6 == 0 と置いて、これが EQ19D と同じことを示したい。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="jkIhAfFA5Hq3" outputId="ec540b35-39fe-41da-e6f0-315cfbdb50a2"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="jkIhAfFA5Hq3" outputId="3d6a84e4-de9a-4fdc-862a-0469f7d6fdc3"
 EQ19c = EQ19D.subs(t, t - 1)
 (EQ19c.lhs - EQ19c.rhs - EQ18tmp6).expand().doit()
 
 # + [markdown] id="Uo-gL8685ZDO"
 # E19c と EQ18tmp6 は同じことであることが示せた。これを最適値を求めるため EQ18tmp に代入して整理していく。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 129} id="HQzrLH9J5doH" outputId="3af66d79-db4b-4ff7-c7be-ec0a094e14cb"
+# + colab={"base_uri": "https://localhost:8080/", "height": 129} id="HQzrLH9J5doH" outputId="110ae91c-b6aa-47fb-ac37-8d75b9bea76d"
 EQ20tmp = EQ18tmp.subs(EQ19c.lhs, EQ19c.rhs)
 EQ20tmp
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="PbNsdaqE5gxA" outputId="43f89f4a-71fb-4635-91dc-a5994529b19a"
+# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="PbNsdaqE5gxA" outputId="46df7844-8633-4140-f02f-41cecdd9e021"
 EQQtTtmp = EQQtT.subs(t, t - 1)
 EQ20tmp2 = mat_trivial_divide(EQ20tmp.expand().subs(EQQtTtmp.lhs, EQQtTtmp.rhs)).doit()
 EQ20tmp2
@@ -429,7 +437,7 @@ EQ20tmp2
 # + [markdown] id="mpNjuwwo-tFm"
 # これが EQ20D と同じことを示したい。
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="5yezUb-D5ltZ" outputId="cf180f2c-e91d-4f1a-9dc6-35c9b6704b7d"
+# + colab={"base_uri": "https://localhost:8080/", "height": 286} id="5yezUb-D5ltZ" outputId="4c10d0f4-8132-49f5-9e07-b66ab17da41d"
 EQ21tmp = EQ21D.subs(t, t - 1)
 EQ22tmp = EQ22D.subs(t, t - 1)
 EQ20tmp = EQ20D.subs(t, t - 1)
@@ -439,9 +447,10 @@ EQ20tmp3 = EQ20tmp.rhs.subs({EQ21tmp.lhs: EQ21tmp.rhs,
                       .expand().doit()
 EQ20tmp3
 
-# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="4V7g2YO15vpo" outputId="8d464640-bc84-4c13-99f8-78876c324999"
+# + colab={"base_uri": "https://localhost:8080/", "height": 37} id="4V7g2YO15vpo" outputId="933fc144-2cfc-401e-c468-a63415750de3"
 (EQ20tmp2 - EQ20tmp3).expand().doit()
 
 # + [markdown] id="5OJkwQZ459Xi"
 # これで t := t - 1 において、EQ19D EQ20D が成り立つことが示せたことになる。これで帰納法でこの節の導出が正しかったことが証明された。…と思う。
 #
+# なお、終わってから気づいたのだが、t := T の時点で帰納法を満たしており、t := T - 1 については言う必要がなかったのかもしれない。ただ、本では示しているため、言った意味が全くないとはならないとは思う。
