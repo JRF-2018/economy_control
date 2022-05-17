@@ -1,6 +1,6 @@
 # economy_control
 
-<!-- Time-stamp: "2022-05-16T21:14:46Z" -->
+<!-- Time-stamp: "2022-05-17T10:30:17Z" -->
 
 村田安雄『動的経済システムの最適制御』の検算＆シミュレーション。
 
@@ -61,39 +61,52 @@ http://jrf.cocolog-nifty.com/statuses/2022/05/post-3b108d.html
 は、SymPy は今のところ (1,1) の行列とスカラーを区別してしまう。第3章2
 節b はその縛りがあっても何とかなったが、7節はそうはいかない感じだ。
 
-まず epsilon(t) みたいな RandomSymbol の Function である
-RandomFunction みたいなものは定義されてない。が、まず、epsilon を普通
-の Function として定義して、epsilon(T) に RandomSymbol の epsilon_T を
-代入してその都度ごまかすみたいなことはできるのかもしれない。
+最新の SymPy には、RandomSymbol や RandomMatrixSymbol や
+RandomIndexedSymbol があり、かなりのことはできるようになっている。 た
+だ、RandomMatrixFunction みたいなものはさすがにない。それでも、
+epsilon(t) みたいな MatrixFunction を定義しておいて、あとから、
+RandomMatrixSymbol の epsilon_T を代入してその都度ごまかすみたいなこと
+はできるのかもしれない。
 
 しかし、以下のようなコードを見ていただきたい。
 
 ```python
 >>> from sympy import *
 >>> from sympy.stats import Expectation, Variance
->>> from sympy.stats.rv import RandomSymbol
+>>> from sympy.stats.rv import RandomSymbol, RandomMatrixSymbol
 
 >>> epsilon = RandomSymbol("epsilon")
+>>> zeta = RandomMatrixSymbol("zeta", 2, 1)
+>>> A = MatrixSymbol("A", 2, 2)
+
 >>> Expectation(epsilon)
 Expectation(epsilon)
 >>> Expectation(2 * epsilon).expand()
 2*Expectation(epsilon)
+>>> Expectation(A * zeta).expand()
+A*ExpectationMatrix(zeta)
+>>> Expectation(zeta.T * A).expand()
+ExpectationMatrix(zeta.T*A)
 >>> Expectation(epsilon * Identity(1)).expand()
 ExpectationMatrix(epsilon*I)
 
 ```
 
-この最後の結果は Expectation(epsilon) * I になって欲しいがそうならない
-のである。
+この最後の二つの結果は zeta.T * Expectation(A) と Expectation(epsilon)
+* I になって欲しいがそうならないのである。
 
-Expectation にがんばってもらうのか、(1,1) 行列がスカラーとして扱えるよ
-うになってもらうべきなのかは私には SymPy の開発者でないのでわからない
-が、そういうことができるのはまだまだ先のようである。
+Expectation にがんばってもらいたいところだが、SymPy の開発者でないので
+わからない部分も多く、そういうことができるのはまだまだ先のようである。
+
+また、(1,1) 行列がスカラーとして扱えるようになってもらいたいところだが、
+Issues の議論を読むと、(1,1) 行列をスカラーと区別することは「仕様」ら
+しく、この点は numpy でも同じなので、そこは期待しても無駄なのかもしれ
+ない…。
 
 確率が出て来ない第9章は導出をするのは面倒くさいが、式から数値を得るこ
 とぐらいは今の SymPy でも検算できるかもしれないとチラと思ったのだが、
 ここも (1,1) 行列がスカラーとして扱えないと(不可能ではないかもしれない
-が)ツラそうだ。numpy だけで検算するなら容易かもしれないが…。
+が)面倒くさそうだ。numpy だけで検算するなら容易かもしれないが…。
 
 ただ、ここで述べたようなことがすべての章に必要かというとそうではないだ
 ろう。そういう部分は今後の課題としたい。
