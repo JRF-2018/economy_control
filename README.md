@@ -1,6 +1,6 @@
 # economy_control
 
-<!-- Time-stamp: "2022-05-17T10:30:17Z" -->
+<!-- Time-stamp: "2026-10-22T14:55:00Z" -->
 
 村田安雄『動的経済システムの最適制御』の検算＆シミュレーション。
 
@@ -18,6 +18,10 @@ https://github.com/JRF-2018/sympy_matrix_tools
 本当はこういった検算・証明は専門の theorem prover を使ってやるべきであ
 る。しかし、無料で誰でも使える Google Colab & Python で示せればそれは
 それで価値があるのではないかと考えた。
+
+2026-10-22 追記: economy_control の更新はこれで終了の予定。
+economy_control_03_2b.ipynb は SymPy 1.14.0 と sympy_matrix_tools 0.4.0
+で再実行し、sympy_matrix_tools のバージョンを v0.4.0 に固定した。
 
 なお、*.ipynb と同じ名前を持った *.py は *.ipynb から jupytext を使っ
 て生成した。それらは diff がしやすいように作った管理用の Python ファイ

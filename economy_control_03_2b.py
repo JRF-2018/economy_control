@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.13.8
+#       jupytext_version: 1.19.6
 #   kernelspec:
 #     display_name: Python 3
 #     name: python3
@@ -14,7 +14,9 @@
 # + [markdown] id="-s-r8b183fe8"
 # # 村田安雄『動的経済システムの最適制御』第3章2節bの検算
 #
-# (Version: 0.0.2)
+# (Version: 0.0.3)
+#
+# 2026-10-22: SymPy 1.14.0 と sympy_matrix_tools 0.4.0 に合わせて再実行した。sympy_matrix_tools のバージョンは v0.4.0 に固定してある。このノートブックの更新はこれで最後の予定。なお、再実行はローカルで行ったので pip のセルの出力はない。
 #
 # 「第3章 離散時間ダイナミック・プログラミングの方法と消費計画への応用」の「2. 確実性下の D.P. の最適化原理」の「［b］m 制御変数と n 状態変数の D.P.」について、行列に関する計算の「検算」を行ってみる。
 #
@@ -27,7 +29,7 @@ from time import gmtime, strftime
 print("Time-stamp: <%s>" % strftime("%Y-%m-%dT%H:%M:%SZ", gmtime()))
 
 # + colab={"base_uri": "https://localhost:8080/"} id="XEwKNWzrgtk4" outputId="5c5cd8e7-a9ed-4e62-aacf-c8956af2f9dc"
-# !pip install git+https://github.com/JRF-2018/sympy_matrix_tools
+# !pip install git+https://github.com/JRF-2018/sympy_matrix_tools@v0.4.0
 
 # + colab={"base_uri": "https://localhost:8080/", "height": 35} id="bjEwAq1cbaJw" outputId="79286c00-9966-472e-dba7-05d39365d484"
 import sympy
